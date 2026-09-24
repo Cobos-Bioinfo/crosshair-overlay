@@ -86,7 +86,8 @@ class Tray(QSystemTrayIcon):
         self._overlay.apply(settings)
         save_settings(settings, self._config_path)
 
-    def _open_settings(self) -> None:
+    def open_settings(self) -> None:
+        """Show the settings dialog (public entry point)."""
         if self._dialog is None:
             self._dialog = SettingsDialog(self._settings, self._apply)
         else:
@@ -94,6 +95,9 @@ class Tray(QSystemTrayIcon):
         self._dialog.show()
         self._dialog.raise_()
         self._dialog.activateWindow()
+
+    def _open_settings(self) -> None:
+        self.open_settings()
 
     def _reload(self) -> None:
         self._settings = load_settings(self._config_path)

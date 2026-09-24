@@ -24,6 +24,11 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         help="Path to the config file (default: per-user config directory).",
     )
     parser.add_argument(
+        "--settings",
+        action="store_true",
+        help="Open the settings window on launch.",
+    )
+    parser.add_argument(
         "--no-tray",
         action="store_true",
         help="Run without a system tray icon (edit the config file to reconfigure).",
@@ -55,6 +60,7 @@ def main(argv: list[str] | None = None) -> int:
     from PySide6.QtWidgets import QApplication, QSystemTrayIcon
 
     from .overlay import Overlay
+    from .settings_dialog import SettingsDialog
     from .tray import Tray
 
     app = QApplication([sys.argv[0]])
@@ -69,17 +75,43 @@ def main(argv: list[str] | None = None) -> int:
     overlay = Overlay(settings)
     overlay.show()
 
+    def apply_and_save(new_settings: Settings) -> None:
+        overlay.apply(new_settings)
+        save_settings(new_settings, config_path)
+
     tray: Tray | None = None
     if not args.no_tray and QSystemTrayIcon.isSystemTrayAvailable():
         tray = Tray(overlay, settings, config_path, app)
         tray.show()
-    else:
-        reason = "disabled with --no-tray" if args.no_tray else "no system tray detected"
+
+    # Keep a reference so the dialog is not garbage collected.
+    dialog: SettingsDialog | None = None
+
+    if tray is not None:
+        if args.settings:
+            tray.open_settings()
+    elif args.no_tray and not args.settings:
+        # Fully headless: overlay only, controlled via the config file.
         print(
-            f"Running without tray ({reason}). "
-            f"Edit {config_path} and restart to reconfigure.",
+            f"Running without tray (disabled with --no-tray). Edit {config_path} and "
+            "restart, or pass --settings to open the settings window.",
             file=sys.stderr,
         )
+    else:
+        # No tray available (or --settings asked without a tray): the settings
+        # window becomes the control surface, and closing it quits the app.
+        if not args.settings:
+            print(
+                "No system tray detected (common on WSL and minimal Linux desktops). "
+                "Opened the settings window instead; close it to quit. For a tray icon "
+                "and a reliable in-game overlay, run on Windows or an X11 desktop.",
+                file=sys.stderr,
+            )
+        dialog = SettingsDialog(settings, apply_and_save)
+        dialog.finished.connect(lambda *_: app.quit())
+        dialog.show()
+        dialog.raise_()
+        dialog.activateWindow()
 
     # Let Ctrl+C from the terminal quit the app; the idle timer lets the Python
     # interpreter run often enough to deliver the signal.

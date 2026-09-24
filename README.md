@@ -63,13 +63,16 @@ Launch it and a green crosshair appears centered on your primary monitor, with a
 Command-line options:
 
 ```
-crosshair [--config PATH] [--no-tray] [--reset] [--version]
+crosshair [--config PATH] [--settings] [--no-tray] [--reset] [--version]
 
   --config PATH   Use a specific config file instead of the default location.
+  --settings      Open the settings window on launch.
   --no-tray       Run without a tray icon (edit the config file to reconfigure).
   --reset         Write default settings to the config file and exit.
   --version       Print the version and exit.
 ```
+
+If no system tray is available (common on WSL and minimal Linux desktops), the settings window opens automatically as the control surface, and closing it quits the app.
 
 ## Configuration
 
@@ -124,7 +127,8 @@ The presets shown in the image above can be reproduced from `scripts/make_previe
 
 - The overlay stays on top of borderless and windowed games. **Exclusive fullscreen** mode can render past any overlay; this is a limitation shared by all external crosshairs. Set the game to borderless or windowed fullscreen if the crosshair disappears.
 - On Linux, a running compositor is required for transparency. Most modern desktops (GNOME, KDE, and others) provide one by default.
-- The system tray needs a tray host. If none is detected the app still runs and prints a note; use the config file or `--config` to adjust it.
+- The system tray needs a tray host. If none is detected the app opens the settings window instead (close it to quit), so it stays usable.
+- WSL2 (WSLg) has no tray and Wayland restricts always-on-top and absolute positioning, so the overlay cannot sit over native Windows games from inside WSL. Develop there if you like, but run it on Windows or an X11 desktop for actual use.
 
 ## Development
 
