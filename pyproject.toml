@@ -1,0 +1,54 @@
+[project]
+name = "crosshair-overlay"
+version = "0.1.0"
+description = "Lightweight, cross-platform crosshair overlay for games. Vector-drawn, click-through, fully customizable."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Cobos-Bioinfo" }]
+keywords = ["crosshair", "overlay", "gaming", "fps", "reticle", "pyside6"]
+classifiers = [
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Games/Entertainment",
+]
+dependencies = [
+    "PySide6-Essentials>=6.6",
+]
+
+[project.urls]
+Homepage = "https://github.com/Cobos-Bioinfo/crosshair-overlay"
+Repository = "https://github.com/Cobos-Bioinfo/crosshair-overlay"
+Issues = "https://github.com/Cobos-Bioinfo/crosshair-overlay/issues"
+
+[project.scripts]
+crosshair = "crosshair_overlay.app:main"
+
+[project.gui-scripts]
+crosshair-overlay = "crosshair_overlay.app:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/crosshair_overlay"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
