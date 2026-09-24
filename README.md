@@ -52,6 +52,26 @@ pip install .
 crosshair          # or: python -m crosshair_overlay
 ```
 
+### Windows and Smart App Control
+
+Windows 11's Smart App Control can block the small `crosshair.exe` launcher that uv and pip generate, because it is unsigned. The symptom is a "Smart App Control has blocked part of this app" notification and an error such as `uv trampoline failed to spawn Python child process`.
+
+You can work around it without turning Smart App Control off by launching the module directly, which skips the generated launcher:
+
+```powershell
+uv run python -m crosshair_overlay
+```
+
+If that is still blocked, use an official signed Python from [python.org](https://www.python.org/downloads/) (or `winget install Python.Python.3.12`) and run the module with it:
+
+```powershell
+py -3.12 -m venv .venv
+.venv\Scripts\python.exe -m pip install .
+.venv\Scripts\python.exe -m crosshair_overlay
+```
+
+While Smart App Control is on, always launch with `python -m crosshair_overlay` rather than the `crosshair` command. Turning Smart App Control off works too, but it cannot be re-enabled without reinstalling Windows, so treat that as a last resort. On Windows you can also just double-click `run.bat`.
+
 ## Usage
 
 Launch it and a green crosshair appears centered on your primary monitor, with an icon in the system tray.
